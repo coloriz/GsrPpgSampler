@@ -5,6 +5,13 @@ VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GsrPpgSampler", "GsrPpgSampler\GsrPpgSampler.csproj", "{97653C8B-84CA-4798-A2EF-65B53F929D54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GsrPpgSamplerDemo", "GsrPpgSamplerDemo\GsrPpgSamplerDemo.csproj", "{B229CE5A-7436-4D37-9614-015A5AD9F57C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9E1F010B-3517-4307-BBB8-4ED24863A145}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +22,10 @@ Global
 		{97653C8B-84CA-4798-A2EF-65B53F929D54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97653C8B-84CA-4798-A2EF-65B53F929D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97653C8B-84CA-4798-A2EF-65B53F929D54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B229CE5A-7436-4D37-9614-015A5AD9F57C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B229CE5A-7436-4D37-9614-015A5AD9F57C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B229CE5A-7436-4D37-9614-015A5AD9F57C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B229CE5A-7436-4D37-9614-015A5AD9F57C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
