@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using InsLab.Signal;
 
 namespace GsrPpgSamplerDemo
@@ -7,20 +8,30 @@ namespace GsrPpgSamplerDemo
     {
         static void Main(string[] args)
         {
-            var sampler = new GsrPpgSampler("COM3", 115200, SamplingRate.SR500Hz, SamplingRate.SR500Hz);
-            sampler.GsrDataArrived += (s, e) =>
-            {
-                Console.WriteLine($"[GSR] Timestamp = {e.Timestamp}, Data = {e.Data}");
-            };
+            //var sampler = new GsrPpgSampler("COM3", 115200, SamplingRate.SR500Hz, SamplingRate.SR500Hz);
+            //sampler.GsrDataArrived += (s, e) =>
+            //{
+            //    Console.WriteLine($"[GSR] Timestamp = {e.Timestamp}, Data = {e.Data}");
+            //};
 
-            sampler.PpgDataArrived += (s, e) =>
-            {
-                Console.WriteLine($"[Ppg] Timestamp = {e.Timestamp}, Data = {e.Data}");
-            };
+            //sampler.PpgDataArrived += (s, e) =>
+            //{
+            //    Console.WriteLine($"[Ppg] Timestamp = {e.Timestamp}, Data = {e.Data}");
+            //};
 
-            sampler.StartReading();
-            Console.ReadKey();
-            sampler.StopReading();
+            //sampler.StartReading();
+            //Console.ReadKey();
+            //sampler.StopReading();
+
+            var data = GsrPpgUtil.ReadGsrPpgData("190429.json");
+
+            //var filteredData = GsrPpgUtil.PPGfiltering(data["PPG"].Select(e => e.Value).ToArray());
+            var filteredData = GsrPpgUtil.GSRfiltering(data["GSR"].Select(e => e.Value).ToArray());
+
+            foreach (var item in filteredData)
+            {
+                Console.WriteLine(item);
+            }
         }
     }
 }
