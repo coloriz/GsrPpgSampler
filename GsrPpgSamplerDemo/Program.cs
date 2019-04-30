@@ -23,14 +23,16 @@ namespace GsrPpgSamplerDemo
             //Console.ReadKey();
             //sampler.StopReading();
 
-            var data = GsrPpgUtil.ReadGsrPpgData("190429.json");
+            var data = GsrPpgUtil.ReadGsrPpgData("190430.json");
 
             //var filteredData = GsrPpgUtil.PPGfiltering(data["PPG"].Select(e => e.Value).ToArray());
-            var filteredData = GsrPpgUtil.GSRfiltering(data["GSR"].Select(e => e.Value).ToArray());
+            var filteredData = GsrPpgUtil.GSRfiltering(data["GSR"]);
+
+            //var filteredData = GsrPpgUtil.GetPPGdata(data["PPG"], TimeSpan.FromMilliseconds(100));
 
             foreach (var item in filteredData)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(item.Value);
             }
         }
     }

@@ -35,7 +35,7 @@ namespace InsLab.Signal
 
             return gsrPpgDataCollection;
         }
-        //
+
         static private int ppg_frame_rate = 500;
         static private int ppg_max = 1024;
         static private int ppg_min_bpm = 60;
@@ -48,7 +48,41 @@ namespace InsLab.Signal
         static private int gsr_gaussian_kernel = 51;
         static private int gsr_max = 32676;
 
-        static public float[] PPGfiltering(int[] ppgData)
+        //static private int interval = 300;
+
+        static public List<GsrPpgPacket> GetPPGdata(List<GsrPpgPacket> data, TimeSpan interval)
+        {
+            var result = new List<GsrPpgPacket>();
+            var currentTime = TimeSpan.FromTicks(data.First().Timestamp);
+            var lastTime = TimeSpan.FromTicks(data.Last().Timestamp);
+            int idx = 0;
+            while (currentTime < lastTime)
+            {
+                var timeList = data.Where(p => ((currentTime - TimeSpan.FromSeconds(5)).Ticks <= p.Timestamp && p.Timestamp <= currentTime.Ticks)).ToList();
+
+                // process
+                if (timeList.Count() < 2400)
+                {
+                    result.Add(new GsrPpgPacket(0, timeList.Last().Timestamp));
+                    idx++;
+                }
+                else
+                {
+                    result.Add(new GsrPpgPacket((int)PPGfiltering(timeList.Select(e => e.Value).ToArray()).Average(), timeList.Last().Timestamp));
+                }
+                currentTime += interval;
+            }
+            
+            for (int i = 0; i < idx; i++)
+                result[i].Value = result[idx].Value;
+
+            for (int i = 0; i < result.Count(); i++)
+                Console.WriteLine($"{TimeSpan.FromTicks(result[i].Timestamp).ToString("g")} : {result[i].Value}");
+
+            return result;
+        }
+
+        static private List<int> PPGfiltering(int[] ppgData)
         {
             float lowcut = (float)ppg_min_bpm / 60.0f / ppg_frame_rate / 2.0f;
             float highcut = (float)ppg_max_bpm / 60.0f / ppg_frame_rate / 2.0f;
@@ -84,41 +118,43 @@ namespace InsLab.Signal
             }
 
             List<float> output = new List<float>();
-            output.Add(90);
+            /*output.Add(90);
             for (int i = 1; i < bpm.Count() - 1; i++)
             {
                 if (bpm[i] == 0)
                     output.Add(output[output.Count() - 1]);
-                else if (10 < (bpm[i] - bpm[i - 1]))
+                else if (30 < (bpm[i] - bpm[i - 1]))
                     output.Add(output[output.Count() - 1]);
                 else
                     output.Add(bpm[i]);
-            }
-
-            var outputG = GaussianFiltering(7, output.ToArray());
-
-            float[] upSampleDaTa = new float[ppgData.Count()];
-
-            for(int i = 0; i < ppgData.Count(); i++)
+            }*/
+            for (int i = 0; i < bpm.Count() - 1; i++)
             {
-                upSampleDaTa[i] = outputG[(int)(ppgData.Count()/i)];
+                if (bpm[i] != 0)
+                    output.Add(bpm[i]);
             }
+            if (output.Count() == 0)
+                output.Add(90);
 
-            return upSampleDaTa;
+            //var outputG = GaussianFiltering(7, output.ToArray());
+
+            List<int> toList = new List<int>();
+            for (int i = 0; i < output.Count(); i++)
+                toList.Add((int)output[i]);
+
+            return toList;
         }
 
-        static public float[] GSRfiltering(int[] GSRdata)
+        static public List<GsrPpgPacket> GSRfiltering(List<GsrPpgPacket> GSRdata)
         {
-            var gsrData = new float[GSRdata.Count()];
-
-            for (int i = 0; i < GSRdata.Count(); i++)
-                gsrData[i] = (float)gsr_max - GSRdata[i];
+            var gsrData_int = GSRdata.Select(e => gsr_max - e.Value).ToArray();
+            var gsrData = Array.ConvertAll(gsrData_int, item => (float)item);
 
             /******************** Gaussian Filtering ********************/
             var filtered = GaussianFiltering(gsr_gaussian_kernel, gsrData);
 
             /******************** Median Filtering ********************/
-            NWaves.Filters.MedianFilter mFilter = new MedianFilter(gsr_subtract_sample);
+            MedianFilter mFilter = new MedianFilter(gsr_subtract_sample);
             DiscreteSignal tonic_GSR = mFilter.ApplyTo(filtered);
 
             var phasic_GSR = filtered.Subtract(tonic_GSR);
@@ -139,13 +175,13 @@ namespace InsLab.Signal
 
             /******************** Find peak ********************/
             bool checkFlag = false;
-            float[] findPeak = new float[filtered.Length];
-
             float max = 0;
 
             int idx1 = 0;
 
-            findPeak[0] = 0;
+            var findPeak = GSRdata.Select(e => new GsrPpgPacket(0, e.Timestamp)).ToList();
+            findPeak[0].Value = 0;
+
             for (int i = 1; i < filtered.Length; i++)
             {
 
@@ -155,7 +191,7 @@ namespace InsLab.Signal
                     {
                         for (int j = idx1; j < i; j++)
                         {
-                            findPeak[j] = max;
+                            findPeak[j].Value = (int)max;
                         }
                         checkFlag = false;
                     }
