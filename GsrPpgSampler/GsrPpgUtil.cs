@@ -76,8 +76,8 @@ namespace InsLab.Signal
             for (int i = 0; i < idx; i++)
                 result[i].Value = result[idx].Value;
 
-            for (int i = 0; i < result.Count(); i++)
-                Console.WriteLine($"{TimeSpan.FromTicks(result[i].Timestamp).ToString("g")} : {result[i].Value}");
+            //for (int i = 0; i < result.Count(); i++)
+            //    Console.WriteLine($"{TimeSpan.FromTicks(result[i].Timestamp).ToString("g")} : {result[i].Value}");
 
             return result;
         }
